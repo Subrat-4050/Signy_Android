@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "624490543847",
+    "project_id": "signy-2e4d8",
+    "storage_bucket": "signy-2e4d8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:624490543847:android:ffadd13843d580abd40042",
+        "android_client_info": {
+          "package_name": "com.example.signy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMKp8E_VkNYvL9E9-RddkM8ER2T4JE-Po"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
