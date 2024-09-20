@@ -7,12 +7,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,7 +25,6 @@ public class LoginActivity extends AppCompatActivity {
     Button loginButton;
     TextView signUpRedirectText;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,10 +38,9 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!validataPassword() | !validataPassword()) {
+                if (!validateUsername() || !validatePassword()) {
                     return;
-                }
-                else {
+                } else {
                     checkUser();
                 }
             }
@@ -61,25 +55,23 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public Boolean validataUsername() {
-        String val = loginUsername.getText().toString();
-        if(val.isEmpty()) {
-            loginUsername.setError("Username cannot be found!");
+    public Boolean validateUsername() {
+        String val = loginUsername.getText().toString().trim();
+        if (val.isEmpty()) {
+            loginUsername.setError("Username cannot be empty!");
             return false;
-        }
-        else {
+        } else {
             loginUsername.setError(null);
             return true;
         }
     }
 
-    public Boolean validataPassword() {
-        String val = loginPassword.getText().toString();
-        if(val.isEmpty()) {
+    public Boolean validatePassword() {
+        String val = loginPassword.getText().toString().trim();
+        if (val.isEmpty()) {
             loginPassword.setError("Password cannot be empty!");
             return false;
-        }
-        else {
+        } else {
             loginPassword.setError(null);
             return true;
         }
@@ -87,28 +79,28 @@ public class LoginActivity extends AppCompatActivity {
 
     public void checkUser() {
         String userUsername = loginUsername.getText().toString().trim();
-        String userPasword = loginPassword.getText().toString().trim();
+        String userPassword = loginPassword.getText().toString().trim();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
         Query checkUserDatabase = reference.orderByChild("username").equalTo(userUsername);
+
         checkUserDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()) {
-                    loginUsername.setError(null);
-                    String passwordFromDB = snapshot.child(userUsername).child("password").getValue(String.class);
-
-                    if(!Objects.equals(passwordFromDB, userPasword)) {
-                        loginUsername.setError(null);
-                        Intent intent  = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
+                if (snapshot.exists()) {
+                    String passwordFromDB = null;
+                    for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                        passwordFromDB = userSnapshot.child("password").getValue(String.class);
                     }
-                    else {
+
+                    if (passwordFromDB != null && passwordFromDB.equals(userPassword)) {
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    } else {
                         loginPassword.setError("Invalid Password");
                         loginPassword.requestFocus();
                     }
-                }
-                else {
+                } else {
                     loginUsername.setError("User does not exist");
                     loginUsername.requestFocus();
                 }
@@ -116,7 +108,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // Handle error if needed
             }
         });
     }

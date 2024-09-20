@@ -8,11 +8,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -28,7 +24,6 @@ public class SignupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_signup);
 
         signupName = findViewById(R.id.signup_name);
@@ -38,33 +33,40 @@ public class SignupActivity extends AppCompatActivity {
         loginRedirectText = findViewById(R.id.loginRedirectText);
         signupButton = findViewById(R.id.signup_button);
 
-        signupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                database = FirebaseDatabase.getInstance();
-                reference = database.getReference();
+        signupButton.setOnClickListener(v -> {
+            database = FirebaseDatabase.getInstance();
+            reference = database.getReference("users"); // Use "users" to save user data under this node
 
-                String name = signupName.getText().toString();
-                String email = signupEmail.getText().toString();
-                String username = signupUsername.getText().toString();
-                String password = signupPassword.getText().toString();
+            String name = signupName.getText().toString().trim();
+            String email = signupEmail.getText().toString().trim();
+            String username = signupUsername.getText().toString().trim();
+            String password = signupPassword.getText().toString().trim();
 
-                HelperClass helperClass = new HelperClass(name, email, username, password);
-                reference.child(name).setValue(helperClass);
-
-                Toast.makeText(SignupActivity.this, "You hava signup successsfully!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
-                startActivity(intent);
-
+            // Input validation
+            if (name.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(SignupActivity.this, "All fields are required!", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            // Create a HelperClass instance
+            HelperClass helperClass = new HelperClass(name, email, username, password);
+
+            // Save the user data under the username key
+            reference.child(username).setValue(helperClass).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(SignupActivity.this, "You have signed up successfully!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(SignupActivity.this, "Signup failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
-        loginRedirectText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
-                startActivity(intent);
-            }
+
+        loginRedirectText.setOnClickListener(v -> {
+            Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+            startActivity(intent);
         });
     }
 }

@@ -4,12 +4,20 @@ public class HelperClass {
 
     String name, email, username, password;
 
-    public HelperClass(String password, String username, String email, String name) {
-        this.password = password;
-        this.username = username;
-        this.email = email;
+    public HelperClass(String name, String email, String username, String password) {
         this.name = name;
+        this.email = email;
+        this.username = username;
+        this.password = password;
     }
+
+//    public HelperClass(String password, String username, String email, String name) {
+//        this.password = password;
+//        this.username = username;
+//        this.email = email;
+//        this.name = name;
+//    } // This was your mistake, you defined the constructor wrong !!
+
 
     public HelperClass() {
     }
